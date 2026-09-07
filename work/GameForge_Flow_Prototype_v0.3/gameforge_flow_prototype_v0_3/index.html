@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GameForge Flow — Prototype v0.3</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+  <div class="noise" aria-hidden="true"></div>
+
+  <main id="app">
+    <!-- SAVE SCREEN -->
+    <section id="saveScreen" class="screen active" data-screen="saves">
+      <header class="screen-topbar">
+        <div class="brand">
+          <div class="brand-mark">GF</div>
+          <div>
+            <strong>GAMEFORGE FLOW</strong>
+            <small>LOCAL PROTOTYPE // v0.3</small>
+          </div>
+        </div>
+        <button id="soundToggle" class="hud-button">SOM: ON</button>
+      </header>
+
+      <div class="save-screen-layout">
+        <aside class="save-column">
+          <div class="save-heading">
+            <span class="eyebrow">LOAD GAME</span>
+            <h1>Escolha seu Save</h1>
+            <p>Selecione um projeto. Enter ou duplo clique abre.</p>
+          </div>
+
+          <div class="save-window">
+            <div class="fade-mask top"></div>
+            <div class="save-selector"><i></i><span>SELECT</span><i></i></div>
+            <div id="saveList" class="save-list"></div>
+            <div class="fade-mask bottom"></div>
+          </div>
+
+          <button id="newSaveBtn" class="main-action subtle">
+            <span>+ NOVO SAVE</span>
+            <b>N</b>
+          </button>
+        </aside>
+
+        <section class="save-preview">
+          <div class="save-preview-card">
+            <span class="eyebrow">SELECTED SAVE</span>
+            <h2 id="selectedSaveName">Pentagory</h2>
+            <p id="selectedSaveMeta">0 documentos · 0 itens · 0 tarefas</p>
+
+            <div class="save-stat-grid">
+              <div><span>VISÃO</span><b id="statDocs">0</b></div>
+              <div><span>PRODUÇÃO</span><b id="statProd">0</b></div>
+              <div><span>EXECUÇÃO</span><b id="statExec">0</b></div>
+            </div>
+
+            <button id="openSaveBtn" class="main-action">
+              <span>ABRIR SAVE</span>
+              <b>ENTER</b>
+            </button>
+
+            <small class="hint">Fluxo: Save → Stages → Trabalho.</small>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <!-- HUB -->
+    <section id="hubScreen" class="screen" data-screen="hub">
+      <header class="screen-topbar stage-hud">
+        <button class="hud-button" data-nav="saves">← SAVES</button>
+        <div class="center-title">
+          <span class="eyebrow">CURRENT SAVE</span>
+          <strong id="hubSaveName">Pentagory</strong>
+        </div>
+        <button id="hubMenuBtn" class="hud-button">ESC // MENU</button>
+      </header>
+
+      <div class="hub-content">
+        <div class="hub-intro">
+          <span class="eyebrow">SELECT STAGE</span>
+          <h1>Escolha onde você quer trabalhar.</h1>
+        </div>
+
+        <div id="stageCards" class="stage-cards">
+          <button class="stage-card vision" data-stage="vision">
+            <div class="card-number">01</div>
+            <div class="stage-icon">
+              <svg viewBox="0 0 64 64">
+                <path d="M22 16c-7 0-12 5-12 12 0 4 2 7 5 9-2 2-3 5-3 8 0 6 5 11 11 11 4 0 7-2 9-5 2 3 5 5 9 5 6 0 11-5 11-11 0-3-1-6-3-8 3-2 5-5 5-9 0-7-5-12-12-12-4 0-7 2-10 5-2-3-6-5-10-5Z"/>
+                <path d="M32 21v30M22 26c6 0 10 4 10 10M42 26c-6 0-10 4-10 10M23 42c5 0 9-3 9-8M41 42c-5 0-9-3-9-8"/>
+              </svg>
+            </div>
+            <div class="card-copy">
+              <span>CREATIVE DIRECTION</span>
+              <h2>VISÃO</h2>
+              <p>Lore, GDD, intenção, regras criativas e decisões canônicas.</p>
+            </div>
+            <div class="card-enter">ABRIR <b>↗</b></div>
+          </button>
+
+          <button class="stage-card production" data-stage="production">
+            <div class="card-number">02</div>
+            <div class="stage-icon">
+              <svg viewBox="0 0 64 64">
+                <path d="M14 14h15v10h-6v8h18v-8h-6V14h15"/>
+                <path d="M23 32v8h-9v10M41 32v8h9v10M32 24v26"/>
+                <circle cx="14" cy="50" r="4"/><circle cx="32" cy="50" r="4"/><circle cx="50" cy="50" r="4"/>
+              </svg>
+            </div>
+            <div class="card-copy">
+              <span>PRODUCER LAYER</span>
+              <h2>PRODUÇÃO</h2>
+              <p>Quebre ideias, agrupe, priorize e prepare o trabalho.</p>
+            </div>
+            <div class="card-enter">ABRIR <b>↗</b></div>
+          </button>
+
+          <button class="stage-card execution" data-stage="execution">
+            <div class="card-number">03</div>
+            <div class="stage-icon">
+              <svg viewBox="0 0 64 64">
+                <path d="M22 24h20c7 0 12 5 13 12l2 12c1 5-5 8-9 4l-8-8H24l-8 8c-4 4-10 1-9-4l2-12c1-7 6-12 13-12Z"/>
+                <path d="M20 31v12M14 37h12M42 34h.1M49 40h.1"/>
+              </svg>
+            </div>
+            <div class="card-copy">
+              <span>TEAM FLOOR</span>
+              <h2>EXECUÇÃO</h2>
+              <p>Tarefas reais, setores, responsáveis, status e sprint.</p>
+            </div>
+            <div class="card-enter">ABRIR <b>↗</b></div>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORK -->
+    <section id="workScreen" class="screen" data-screen="work">
+      <header class="screen-topbar stage-hud">
+        <button class="hud-button" data-nav="hub">← STAGES</button>
+
+        <div class="stage-switcher">
+          <button id="prevStageBtn" class="stage-nav-button ghost hidden"></button>
+          <div class="center-title">
+            <span id="workEyebrow" class="eyebrow">STAGE 01</span>
+            <strong id="workTitle">VISÃO</strong>
+          </div>
+          <button id="nextStageBtn" class="stage-nav-button ghost hidden"></button>
+        </div>
+
+        <button id="workMenuBtn" class="hud-button">ESC // MENU</button>
+      </header>
+
+      <div class="shortcut-bar">
+        <span>ALT + 1</span>
+        <span>ALT + 2</span>
+        <span>ALT + 3</span>
+      </div>
+
+      <div class="work-area">
+        <section id="visionPanel" class="work-panel">
+          <aside class="doc-strip">
+            <div class="strip-head">
+              <span>DOCUMENTOS</span>
+              <button id="newDocBtn" class="mini-button">+</button>
+            </div>
+            <div id="docList" class="doc-list"></div>
+          </aside>
+
+          <section class="focus-editor">
+            <div class="editor-head">
+              <div class="doc-name-wrap">
+                <input id="docTitle" class="doc-title-input" value="Visão do Projeto" />
+                <span id="docStatus" class="status-chip canon">CANÔNICO</span>
+              </div>
+
+              <div class="editor-mode-switch">
+                <button data-editor-mode="edit" class="active">EDITAR</button>
+                <button data-editor-mode="preview">PREVIEW</button>
+              </div>
+
+              <div class="editor-actions">
+                <select id="docStatusSelect">
+                  <option value="canon">Canônico</option>
+                  <option value="probable">Provável</option>
+                  <option value="experiment">Experimento</option>
+                </select>
+                <button id="sendSelectionBtn" class="accent-button">ENVIAR → PRODUÇÃO</button>
+              </div>
+            </div>
+
+            <div id="markdownToolbar" class="markdown-toolbar">
+              <button data-md="**">B</button>
+              <button data-md="*"><i>I</i></button>
+              <button data-md="# ">H1</button>
+              <button data-md="## ">H2</button>
+              <button data-md="- ">LISTA</button>
+              <button data-md="> ">CITAÇÃO</button>
+              <span>MARKDOWN</span>
+            </div>
+
+            <textarea id="visionEditor" spellcheck="false"></textarea>
+            <article id="markdownPreview" class="markdown-preview hidden"></article>
+
+            <div class="editor-footer">
+              <span id="selectionInfo">Selecione um trecho e envie para Produção.</span>
+              <span id="saveIndicator">SALVO</span>
+            </div>
+          </section>
+        </section>
+
+        <section id="productionPanel" class="work-panel hidden">
+          <div class="panel-hero">
+            <div>
+              <span class="eyebrow">PRODUCER BOARD</span>
+              <h2>Transforme direção em trabalho.</h2>
+            </div>
+            <button id="newProdBtn" class="accent-button">+ NOVO CARD</button>
+          </div>
+
+          <div id="productionBoard" class="board"></div>
+        </section>
+
+        <section id="executionPanel" class="work-panel hidden">
+          <div class="execution-layout">
+            <aside class="department-list">
+              <span class="eyebrow">SETORES</span>
+              <button class="department active" data-dept="all">◆ Todos</button>
+              <button class="department" data-dept="design">◈ Game Design</button>
+              <button class="department" data-dept="code">⌘ Programming</button>
+              <button class="department" data-dept="art">◫ Art / 3D</button>
+              <button class="department" data-dept="audio">◉ Audio</button>
+              <button class="department" data-dept="lore">✦ Narrative</button>
+              <button id="newExecBtn" class="accent-button full">+ NOVA TAREFA</button>
+            </aside>
+
+            <section class="execution-focus">
+              <div class="panel-hero execution-hero">
+                <div>
+                  <span class="eyebrow">SPRINT</span>
+                  <h2>VERTEX // 01</h2>
+                </div>
+
+                <div class="progress-wrap">
+                  <div class="progress-track"><div id="sprintProgress" class="progress-fill"></div></div>
+                  <span id="progressLabel">0%</span>
+                </div>
+              </div>
+
+              <div id="executionBoard" class="execution-board"></div>
+            </section>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <div id="pauseMenu" class="pause-menu hidden">
+    <div class="pause-card">
+      <span class="eyebrow">PAUSED</span>
+      <h2>MENU</h2>
+      <button data-pause-action="resume">CONTINUAR</button>
+      <button data-pause-action="hub">VOLTAR AOS STAGES</button>
+      <button data-pause-action="saves">VOLTAR AOS SAVES</button>
+      <button data-pause-action="settings">CONFIGURAÇÕES</button>
+    </div>
+  </div>
+
+  <div id="contextMenu" class="context-menu hidden">
+    <button data-action="send-production">↗ Enviar para Produção</button>
+    <button data-action="mark-canon">✓ Marcar como Canônico</button>
+    <button data-action="copy">⧉ Copiar</button>
+  </div>
+
+  <div id="modalBackdrop" class="modal-backdrop hidden">
+    <div id="modal" class="modal">
+      <button id="modalClose" class="modal-close">×</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <div id="toastHost" class="toast-host"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

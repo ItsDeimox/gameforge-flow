@@ -1,0 +1,10 @@
+{
+  "name": "GameForge Flow",
+  "short_name": "GameForge",
+  "description": "Pipeline local-first para desenvolvimento de jogos.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#05080d",
+  "theme_color": "#070b11",
+  "lang": "pt-BR"
+}

@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "gameforge-flow": {
+      "command": "python",
+      "args": ["C:/CAMINHO/GameForge_Flow_v0.9.0/mcp_server.py"],
+      "env": {
+        "GAMEFORGE_DATA_DIR": "C:/CAMINHO/GameForge_Flow_Data",
+        "GAMEFORGE_ROOM_ID": "ID_DA_SALA",
+        "GAMEFORGE_HOST_KEY": "CHAVE_DO_HOST"
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+.gameforge-server.pid
+GameForge_Flow_Data/
+outputs/qa/
+mcp-config.generated.json
+host-key.txt
+.DS_Store
+Thumbs.db

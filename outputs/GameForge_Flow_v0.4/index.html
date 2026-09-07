@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#070b11" />
+  <meta name="description" content="Pipeline local-first para desenvolvimento de jogos: Visão, Produção e Execução." />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <title>GameForge Flow — Equipe Local v0.9.0</title>
+  <link rel="stylesheet" href="styles.css?v=0.9.0" />
+</head>
+<body>
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+  <div class="noise" aria-hidden="true"></div>
+
+  <main id="app">
+    <!-- SAVE SCREEN -->
+    <section id="saveScreen" class="screen active" data-screen="saves">
+      <header class="screen-topbar save-topbar">
+        <div class="brand" title="GameForge Flow" aria-label="GameForge Flow">
+          <div class="brand-mark">GF</div>
+          <div>
+            <strong>GAMEFORGE FLOW</strong>
+            <small>LOCAL FIRST // v0.9.0</small>
+          </div>
+        </div>
+        <div class="save-heading">
+          <span>SELECT SAVE</span>
+          <i aria-hidden="true"></i>
+        </div>
+        <button id="soundToggle" class="hud-button">SOM: ON</button>
+      </header>
+
+      <div class="save-screen-layout">
+        <div id="saveWindow" class="save-window">
+          <div class="fade-mask top"></div>
+          <div class="save-selector" aria-hidden="true"><i></i><b></b><i></i></div>
+          <div id="saveList" class="save-list" role="listbox" aria-label="Saves disponíveis"></div>
+          <div class="fade-mask bottom"></div>
+        </div>
+
+        <footer class="save-footer">
+          <div class="save-secondary-actions">
+            <button id="newSaveBtn" class="save-text-action"><span>＋</span> NOVO SAVE <kbd>N</kbd></button>
+            <button id="importSaveBtn" class="save-text-action" title="Importar Save" aria-label="Importar Save"><span>⇧</span> IMPORTAR</button>
+            <button id="connectSaveBtn" class="save-text-action"><span>◎</span> CONEXÃO</button>
+            <button id="deleteSelectedSaveBtn" class="save-text-action save-delete-action"><span>×</span> EXCLUIR</button>
+          </div>
+
+          <div class="save-control-hints" aria-hidden="true">
+            <span><kbd>↑↓</kbd> NAVEGAR</span>
+            <span><kbd>↵</kbd> ABRIR</span>
+          </div>
+
+          <button id="openSaveBtn" class="save-open-action">
+            <span>ABRIR</span>
+            <kbd>ENTER</kbd>
+          </button>
+        </footer>
+      </div>
+    </section>
+
+    <!-- HUB -->
+    <section id="hubScreen" class="screen" data-screen="hub">
+      <header class="screen-topbar hub-topbar">
+        <button class="hub-brand-button" data-nav="saves" aria-label="Voltar para seleção de Saves" title="Voltar para Saves">
+          <svg class="nav-back-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 12H5m7-7-7 7 7 7" /></svg>
+        </button>
+        <div class="hub-heading">
+          <strong>SELECT STAGE</strong>
+          <i aria-hidden="true"></i>
+        </div>
+        <span class="hub-topbar-balance" aria-hidden="true"></span>
+      </header>
+
+      <div class="hub-content">
+        <div id="stageCards" class="stage-map" data-selected="production" role="listbox" aria-label="Etapas do projeto">
+          <svg class="stage-map-geometry" viewBox="0 0 1200 620" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <path class="stage-path stage-path-left" d="M40 382 H310 L600 92" />
+            <path class="stage-path stage-path-right" d="M600 92 L890 382 H1160" />
+            <circle class="stage-node stage-node-vision" cx="310" cy="382" r="5" />
+            <circle class="stage-node stage-node-production" cx="600" cy="92" r="5" />
+            <circle class="stage-node stage-node-execution" cx="890" cy="382" r="5" />
+          </svg>
+
+          <button class="stage-choice vision" data-stage="vision" role="option" aria-selected="false">
+            <span>VISÃO</span>
+          </button>
+          <button class="stage-choice production selected" data-stage="production" role="option" aria-selected="true">
+            <span>PRODUÇÃO</span>
+          </button>
+          <button class="stage-choice execution" data-stage="execution" role="option" aria-selected="false">
+            <span>EXECUÇÃO</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORK -->
+    <section id="workScreen" class="screen" data-screen="work">
+      <header class="work-stage-header">
+        <button class="work-brand-button" data-nav="hub" aria-label="Voltar para seleção de etapas" title="Voltar para etapas"><svg class="nav-back-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 12H5m7-7-7 7 7 7" /></svg></button>
+
+        <nav id="workStageRail" class="work-stage-rail" data-active="vision" aria-label="Etapas do projeto">
+          <button data-work-stage="vision" aria-selected="true">VISÃO</button>
+          <i class="work-stage-link" aria-hidden="true"><b data-stage-node="vision" class="active"></b><b data-stage-node="production"></b></i>
+          <button data-work-stage="production" aria-selected="false">PRODUÇÃO</button>
+          <i class="work-stage-link" aria-hidden="true"><b data-stage-node="production"></b><b data-stage-node="execution"></b></i>
+          <button data-work-stage="execution" aria-selected="false">EXECUÇÃO</button>
+        </nav>
+
+        <button id="presenceIndicator" class="presence-indicator hidden" type="button" aria-label="Pessoas conectadas" title="Equipe conectada"><i></i><span>0</span></button>
+        <button id="workMenuBtn" class="work-menu-button" aria-label="Abrir menu" title="Menu">⌘</button>
+      </header>
+
+      <div class="work-area">
+        <section id="visionPanel" class="work-panel">
+          <aside class="doc-strip">
+            <div class="strip-head">
+              <span>DOCUMENTOS</span>
+            </div>
+            <nav id="docList" class="doc-list" aria-label="Documentos do projeto"></nav>
+            <button id="newDocBtn" class="new-doc-action"><span aria-hidden="true">＋</span> NOVO DOCUMENTO</button>
+          </aside>
+
+          <section class="focus-editor">
+            <div class="editor-head">
+              <div class="doc-name-wrap">
+                <input id="docTitle" class="doc-title-input" value="Visão do Projeto" aria-label="Título do documento" />
+                <span id="docStatus" class="doc-state-control canon">
+                  <select id="docStatusSelect" aria-label="Status do documento">
+                    <option value="draft">Rascunho</option>
+                    <option value="canon">Canônico</option>
+                    <option value="probable">Provável</option>
+                    <option value="experiment">Experimento</option>
+                    <option value="deprecated">Depreciado</option>
+                  </select>
+                  <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg>
+                </span>
+              </div>
+
+              <div class="editor-mode-switch">
+                <button data-editor-mode="live" class="active">LIVE</button>
+                <button data-editor-mode="markdown">MARKDOWN</button>
+              </div>
+
+            </div>
+
+            <div class="vision-title-rule" aria-hidden="true">
+              <i></i><svg viewBox="0 0 96 32"><path d="M0 1 48 20 96 1" /><circle cx="48" cy="29" r="2.5" /></svg><i></i>
+            </div>
+
+            <div class="editor-surface">
+              <article id="liveEditor" class="markdown-preview live-editor" contenteditable="true" spellcheck="true" aria-label="Editor visual Markdown"></article>
+              <textarea id="visionEditor" class="hidden" spellcheck="false" aria-label="Editor Markdown bruto"></textarea>
+            </div>
+
+            <div class="vision-editor-dock">
+            <div id="markdownToolbar" class="markdown-toolbar" role="group" aria-label="Formatação do documento">
+              <button data-md="# " aria-label="Título 1" title="Título 1">H1</button>
+              <button data-md="## " aria-label="Título 2" title="Título 2">H2</button>
+              <button data-md="### " aria-label="Título 3" title="Título 3">H3</button>
+              <i></i>
+              <button data-md="**" aria-label="Negrito" title="Negrito"><b>B</b></button>
+              <button data-md="*" aria-label="Itálico" title="Itálico"><em>I</em></button>
+              <i></i>
+              <button data-md="- " aria-label="Lista" title="Lista"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11" /><circle cx="4" cy="6" r="1" /><circle cx="4" cy="12" r="1" /><circle cx="4" cy="18" r="1" /></svg></button>
+              <button data-md="- [ ] " aria-label="Checklist" title="Checklist"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 6 2 2 3-4m3 2h10M3 13h5v5H3zM11 15h10" /></svg></button>
+              <i></i>
+              <button data-md="> " aria-label="Citação" title="Citação"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h6v7H5c0 3 1 4 3 5M14 6h6v7h-5c0 3 1 4 3 5" /></svg></button>
+            </div>
+              <button id="docCollaborationBtn" class="doc-collaboration-button" type="button"><span aria-hidden="true">◎</span> COMENTÁRIOS E ARQUIVOS</button>
+              <span id="saveIndicator" role="status">SALVO</span>
+            </div>
+            <span id="selectionInfo" class="sr-only" aria-live="polite"></span>
+          </section>
+        </section>
+
+        <section id="productionPanel" class="work-panel hidden">
+          <div class="production-toolbar">
+          <div class="production-filter-bar" role="group" aria-label="Filtros de produção" tabindex="0">
+            <span class="production-filter-label">FILTROS <b>⌁</b></span>
+            <button class="production-filter active" data-prod-filter="all"><i></i>TODOS</button>
+            <button class="production-filter" data-prod-filter="design">DESIGN</button>
+            <button class="production-filter" data-prod-filter="art">ARTE</button>
+            <button class="production-filter" data-prod-filter="code">PROGRAMAÇÃO</button>
+            <button class="production-filter" data-prod-filter="audio">ÁUDIO</button>
+            <button class="production-filter" data-prod-filter="qa">QA</button>
+            <button class="production-filter" data-prod-filter="lore">NARRATIVA</button>
+            <span class="production-filter-spacer"></span>
+            <span class="production-sort">PRIORIDADE⌄</span>
+            <span class="production-sort">FONTE⌄</span>
+          </div>
+          <button id="newDemandBtn" class="section-create-action">NOVA DEMANDA <span aria-hidden="true">＋</span></button>
+          </div>
+
+          <div id="productionBoard" class="production-board"></div>
+          <div class="production-drag-hint" aria-hidden="true"><i>⠿</i> ARRASTE UMA DEMANDA PARA MOVER ENTRE AS ETAPAS</div>
+        </section>
+
+        <section id="executionPanel" class="work-panel hidden">
+          <div class="execution-layout">
+            <aside class="department-list">
+              <span class="department-title">DEPARTAMENTOS</span>
+              <button class="department active" data-dept="all"><i>◎</i><span>TODOS</span><b></b></button>
+              <button class="department" data-dept="design"><i>◩</i><span>DESIGN</span></button>
+              <button class="department" data-dept="code"><i>〈〉</i><span>PROGRAMAÇÃO</span></button>
+              <button class="department" data-dept="art"><i>◒</i><span>ARTE</span></button>
+              <button class="department" data-dept="audio"><i>≋</i><span>ÁUDIO</span></button>
+              <button class="department" data-dept="qa"><i>✓</i><span>QA</span></button>
+              <button class="department" data-dept="production"><i>⚑</i><span>PRODUÇÃO</span></button>
+              <button class="execution-back" data-nav="hub">← <span>VOLTAR</span></button>
+            </aside>
+
+            <section class="execution-focus">
+              <div class="execution-sprint-head">
+                <div class="execution-sprint-summary">
+                <span>SPRINT ATUAL</span>
+                <div class="progress-wrap">
+                  <div class="progress-track"><div id="sprintProgress" class="progress-fill"></div></div>
+                  <span id="progressLabel">0%</span>
+                </div>
+                </div>
+                <button id="newTaskBtn" class="section-create-action">NOVA TAREFA <span aria-hidden="true">＋</span></button>
+              </div>
+
+              <div id="executionBoard" class="execution-board"></div>
+            </section>
+
+            <aside id="taskDetailPanel" class="task-detail-panel"></aside>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <div id="pauseMenu" class="pause-menu hidden" role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
+    <div class="pause-card">
+      <button id="pauseClose" class="overlay-close" aria-label="Fechar menu">×</button>
+      <header class="pause-heading">
+        <span class="overlay-brand" aria-hidden="true">GF</span>
+        <span class="eyebrow">GAMEFORGE FLOW</span>
+        <h2 id="pauseTitle">MENU</h2>
+        <p id="pauseProjectName"></p>
+      </header>
+      <nav class="pause-actions" aria-label="Menu do projeto">
+        <button data-pause-action="resume"><i aria-hidden="true"></i><span>CONTINUAR</span><kbd>ESC</kbd></button>
+        <button data-pause-action="hub"><i aria-hidden="true"></i><span>SELECIONAR ETAPA</span><b aria-hidden="true">↗</b></button>
+        <button data-pause-action="saves"><i aria-hidden="true"></i><span>SELECIONAR SAVE</span><b aria-hidden="true">↗</b></button>
+        <button data-pause-action="settings"><i aria-hidden="true"></i><span>CONFIGURAÇÕES</span><b aria-hidden="true">＋</b></button>
+        <button data-pause-action="team"><i aria-hidden="true"></i><span>EQUIPE DO SAVE</span><b aria-hidden="true">＋</b></button>
+        <button data-pause-action="connection"><i aria-hidden="true"></i><span>CONEXÃO <small id="connectionStateText">LOCAL</small></span><b aria-hidden="true">◎</b></button>
+      </nav>
+      <footer class="pause-footer"><i aria-hidden="true"></i> PROGRESSO SALVO NESTE DISPOSITIVO</footer>
+    </div>
+  </div>
+
+  <div id="contextMenu" class="context-menu vision-selection-menu hidden" role="group" aria-label="Ações do trecho selecionado">
+    <button id="sendSelectionBtn" data-action="send-production" aria-keyshortcuts="Control+Shift+P Meta+Shift+P" title="Enviar trecho para Produção · Ctrl/Cmd + Shift + P"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16m-7-7 7 7-7 7" /></svg><span>Enviar para Produção</span></button>
+  </div>
+
+  <div id="modalBackdrop" class="modal-backdrop hidden">
+    <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button id="modalClose" class="modal-close" aria-label="Fechar janela">×</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <div id="toastHost" class="toast-host" role="status" aria-live="polite" aria-atomic="false"></div>
+  <input id="importFileInput" type="file" accept=".json,.gameforge.json,application/json" hidden />
+
+  <script type="module" src="app.js?v=0.9.0"></script>
+</body>
+</html>
